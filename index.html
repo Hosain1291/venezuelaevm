@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>최종 투표 시뮬레이터</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e0e5ec;
+        }
+        .neumorphic-shadow {
+            box-shadow: 8px 8px 16px #c5c9d0, -8px -8px 16px #fbffff;
+        }
+        .neumorphic-shadow-inset {
+            box-shadow: inset 6px 6px 12px #c5c9d0, inset -6px -6px 12px #fbffff;
+        }
+        .machine-body {
+            background-color: #e0e5ec;
+            position: relative;
+        }
+        .screen-bezel {
+            background: #3c4a5c;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .screen {
+            background: #2d3748;
+            height: 300px;
+            border: 2px solid #1a202c;
+            box-shadow: inset 0 0 10px #000;
+        }
+        .printer-slot {
+            background: linear-gradient(to right, #4a5568, #2d3748, #4a5568);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        .receipt {
+            background-color: #fffff2;
+            transform-origin: top;
+            transition: transform 1.5s ease-out, opacity 1s ease-out;
+            transform: translateY(-30px) scaleY(0);
+            opacity: 0;
+            z-index: 5;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .receipt.printing {
+            transform: translateY(0) scaleY(1);
+            opacity: 1;
+        }
+        .candidate-board {
+            background-color: #e9eef2;
+            position: relative;
+        }
+        .board-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(233, 238, 242, 0.8);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            transition: opacity 0.3s;
+        }
+        .candidate-cell {
+            background-color: white;
+            border: 2px solid #b0b8c0;
+            transition: transform 0.1s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .candidate-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 100, 255, 0.5);
+            z-index: 10;
+        }
+        .candidate-cell.selected {
+             box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+             border: 3px solid #ff0000;
+        }
+        .blue-accent {
+            background: linear-gradient(145deg, #0d47a1, #1976d2);
+        }
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        #photo-drop-zone.dragover {
+            border-color: #3b82f6; /* Tailwind blue-500 */
+            background-color: #eff6ff; /* Tailwind blue-100 */
+        }
+    </style>
+</head>
+<body class="p-4 lg:p-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-7xl mx-auto">
+        <!-- 왼쪽: 투표기 및 관리 패널 -->
+        <div class="space-y-8">
+            <div class="machine-body rounded-2xl neumorphic-shadow">
+                <div class="screen-bezel rounded-t-2xl p-5">
+                    <div id="screen" class="screen rounded-lg flex flex-col items-center justify-center p-4 text-white">
+                        <div id="screen-initial" class="text-center">
+                            <h2 class="text-2xl font-bold text-gray-300">투표 시스템</h2>
+                            <p class="text-gray-400 mt-2">'투표 시작' 버튼을 눌러주세요.</p>
+                        </div>
+                        <div id="screen-selection" class="hidden text-center"></div>
+                        <div id="screen-voted" class="hidden text-center">
+                             <svg class="w-16 h-16 text-green-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <h2 class="text-2xl font-bold text-green-300">투표 완료!</h2>
+                            <p class="text-gray-400 mt-2 animate-pulse">영수증 인쇄 중...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="printer-slot h-3 w-3/4 mx-auto rounded"></div>
+                    <div class="blue-accent h-16 rounded-b-2xl mt-4 flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">Smartmatic</span>
+                    </div>
+                </div>
+                <div id="receipt" class="receipt w-2/3 mx-auto absolute left-0 right-0 top-full mt-[-80px] p-4"></div>
+            </div>
+            <div class="candidate-board rounded-2xl p-5 neumorphic-shadow">
+                <h2 class="text-xl font-bold text-gray-700 mb-4 pb-2 border-b-2">관리 패널</h2>
+                <div class="mb-6">
+                    <h3 class="font-bold text-gray-600 mb-3">투표 절차</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <button id="start-voting-button" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors">투표 시작</button>
+                        <button id="retake-vote-button" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors hidden">재투표</button>
+                        <button id="end-voting-button" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors hidden">투표 종료</button>
+                    </div>
+                </div>
+                <div>
+                     <h3 class="font-bold text-gray-600 mb-3">후보자 목록 (자동 저장)</h3>
+                    <form id="candidate-form" class="space-y-4">
+                        <input id="candidate-name" type="text" placeholder="후보자 이름" class="w-full p-3 rounded-lg neumorphic-shadow-inset bg-transparent" required>
+                        <input id="party-name" type="text" placeholder="정당 이름" class="w-full p-3 rounded-lg neumorphic-shadow-inset bg-transparent" required>
+                        <div class="flex items-center gap-4">
+                            <label for="party-color" class="font-semibold text-gray-600">정당 색상:</label>
+                            <input id="party-color" type="color" value="#c92a2a" class="w-12 h-12 rounded-lg cursor-pointer overflow-hidden border-2 border-transparent neumorphic-shadow">
+                        </div>
+                        <div id="photo-drop-zone" class="border-2 border-dashed border-gray-400 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors">
+                             <label for="candidate-photo" class="font-semibold text-gray-600 mb-2 block cursor-pointer">후보자 사진 (선택 사항)</label>
+                             <div id="drop-zone-prompt">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                 <p class="text-gray-500 mt-2">여기에 파일을 드래그 앤 드롭하거나<br><span class="text-blue-500 font-semibold">클릭하여 선택하세요.</span></p>
+                             </div>
+                             <input id="candidate-photo" type="file" accept="image/*" class="hidden">
+                             <img id="photo-preview" src="" alt="사진 미리보기" class="hidden max-h-24 mx-auto mt-2 rounded">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors">후보자 추가</button>
+                        <button type="button" id="reset-candidates-button" class="w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors mt-2">목록 초기화</button>
+                    </form>
+                </div>
+            </div>
+             <!-- 투표 집계 패널 -->
+            <div class="candidate-board rounded-2xl p-5 neumorphic-shadow">
+                <h2 class="text-xl font-bold text-gray-700 mb-4 pb-2 border-b-2">투표 집계</h2>
+                <div class="mb-4">
+                    <span class="font-bold text-gray-600">총 투표 수:</span>
+                    <span id="total-votes" class="font-bold text-2xl text-blue-600">0</span>
+                </div>
+                <div id="tally-results" class="space-y-4">
+                    <!-- 집계 결과가 여기에 동적으로 추가됩니다. -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 후보자 선택 보드 -->
+        <div class="candidate-board rounded-2xl p-3 neumorphic-shadow w-full">
+             <div id="board-overlay" class="board-overlay rounded-2xl">
+                <p id="overlay-text" class="text-2xl font-bold text-gray-800 bg-white/50 px-6 py-3 rounded-xl">투표 시작 버튼을 눌러주세요.</p>
+            </div>
+            <div class="bg-white p-1 mb-2">
+                <img src="https://placehold.co/600x40/003366/FFFFFF?text=TARJETA+ELECTORAL" class="w-full" alt="Ballot Title"/>
+            </div>
+            <div id="candidate-grid" class="grid grid-cols-4 gap-2 min-h-[300px]"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const candidateForm = document.getElementById('candidate-form');
+            const candidateGrid = document.getElementById('candidate-grid');
+            const resetCandidatesButton = document.getElementById('reset-candidates-button');
+            const startVotingButton = document.getElementById('start-voting-button');
+            const endVotingButton = document.getElementById('end-voting-button');
+            const retakeVoteButton = document.getElementById('retake-vote-button');
+            const boardOverlay = document.getElementById('board-overlay');
+            const overlayText = document.getElementById('overlay-text');
+            const screenInitial = document.getElementById('screen-initial');
+            const screenSelection = document.getElementById('screen-selection');
+            const screenVoted = document.getElementById('screen-voted');
+            const receipt = document.getElementById('receipt');
+            const totalVotesEl = document.getElementById('total-votes');
+            const tallyResultsEl = document.getElementById('tally-results');
+            const photoDropZone = document.getElementById('photo-drop-zone');
+            const photoPreview = document.getElementById('photo-preview');
+            const dropZonePrompt = document.getElementById('drop-zone-prompt');
+            const candidatePhotoInput = document.getElementById('candidate-photo');
+
+            let candidates = [];
+            let totalVotes = 0;
+            let selectedCandidate = null;
+            let isVotingProcess = false;
+            let nextId = 1;
+            let votingState = 'inactive';
+            const STORAGE_KEY = 'votingSimulatorData';
+
+            const saveState = () => {
+                const state = { candidates, totalVotes };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            };
+
+            const loadState = () => {
+                const savedData = localStorage.getItem(STORAGE_KEY);
+                if (savedData) {
+                    const state = JSON.parse(savedData);
+                    candidates = state.candidates || [];
+                    totalVotes = state.totalVotes || 0;
+                    if (candidates.length > 0) {
+                        nextId = Math.max(...candidates.map(c => c.id)) + 1;
+                    }
+                }
+            };
+
+            const renderCandidates = () => {
+                const TOTAL_CELLS = 16; // 4x4 그리드, 총 16칸
+                candidateGrid.innerHTML = '';
+
+                for (let i = 0; i < TOTAL_CELLS; i++) {
+                    if (i < candidates.length) {
+                        const c = candidates[i];
+                        const cell = document.createElement('div');
+                        // 3:4 비율 적용
+                        cell.className = 'candidate-cell rounded aspect-[3/4]';
+                        cell.dataset.id = c.id;
+                        cell.innerHTML = `
+                            <img src="${c.photo}" alt="${c.name}" class="w-full h-[55%] object-cover">
+                            <p class="text-center font-bold text-black text-[10px] py-1">${c.name}</p>
+                            <div class="party-banner w-full text-center text-white font-bold text-sm mt-auto flex-grow flex items-center justify-center" style="background-color: ${c.color};">${c.party}</div>
+                        `;
+                        cell.addEventListener('click', () => handleCandidateSelection(c, cell));
+                        candidateGrid.appendChild(cell);
+                    } else {
+                        // 빈 칸을 위한 플레이스홀더
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'candidate-cell rounded bg-gray-200/50 neumorphic-shadow-inset aspect-[3/4]';
+                        candidateGrid.appendChild(placeholder);
+                    }
+                }
+            };
+            
+            const renderTally = () => {
+                totalVotesEl.textContent = totalVotes;
+                tallyResultsEl.innerHTML = '';
+
+                if (votingState === 'ended') {
+                    if (candidates.length === 0) {
+                         tallyResultsEl.innerHTML = `<p class="text-center text-gray-500">후보자가 없습니다.</p>`;
+                         return;
+                    }
+                    const sortedCandidates = [...candidates].sort((a, b) => (b.votes || 0) - (a.votes || 0));
+                    sortedCandidates.forEach(c => {
+                        const votes = c.votes || 0;
+                        const percentage = totalVotes > 0 ? ((votes / totalVotes) * 100).toFixed(1) : 0;
+                        const tallyItem = document.createElement('div');
+                        tallyItem.innerHTML = `
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-sm">${c.name}</span>
+                                <span class="text-sm font-semibold">${votes}표 (${percentage}%)</span>
+                            </div>
+                            <div class="w-full bg-gray-300 rounded-full h-4 neumorphic-shadow-inset">
+                                <div class="progress-bar h-4 rounded-full text-white text-xs flex items-center justify-center" style="width: ${percentage}%; background-color: ${c.color};">
+                                </div>
+                            </div>
+                        `;
+                        tallyResultsEl.appendChild(tallyItem);
+                    });
+                } else {
+                    tallyResultsEl.innerHTML = `<p class="text-center text-gray-500 p-4 neumorphic-shadow-inset rounded-lg">투표가 종료된 후 결과가 공개됩니다.</p>`;
+                }
+            };
+            
+            const updateUIforVotingState = () => {
+                renderTally(); // 상태 변경 시 항상 집계판 업데이트
+                if (votingState === 'inactive') {
+                    boardOverlay.classList.remove('hidden');
+                    overlayText.textContent = '투표 시작 버튼을 눌러주세요.';
+                    startVotingButton.classList.remove('hidden');
+                    endVotingButton.classList.add('hidden');
+                    retakeVoteButton.classList.add('hidden');
+                    screenInitial.querySelector('p').textContent = "'투표 시작' 버튼을 눌러주세요.";
+                    resetSimulation();
+                } else if (votingState === 'active') {
+                    boardOverlay.classList.add('hidden');
+                    startVotingButton.classList.add('hidden');
+                    endVotingButton.classList.remove('hidden');
+                    retakeVoteButton.classList.remove('hidden');
+                    screenInitial.querySelector('p').textContent = "후보자를 선택해주세요.";
+                } else if (votingState === 'ended') {
+                    boardOverlay.classList.remove('hidden');
+                    overlayText.textContent = '투표가 종료되었습니다. 새 투표를 시작하세요.';
+                    startVotingButton.classList.remove('hidden');
+                    startVotingButton.textContent = '새 투표 시작';
+                    endVotingButton.classList.add('hidden');
+                    retakeVoteButton.classList.add('hidden');
+                    screenInitial.querySelector('p').textContent = "'새 투표 시작' 버튼을 눌러주세요.";
+                    resetSimulation();
+                }
+            };
+            
+            startVotingButton.addEventListener('click', () => {
+                if(candidates.length === 0) {
+                    alert('후보자를 먼저 추가해야 투표를 시작할 수 있습니다.');
+                    return;
+                }
+                if (votingState === 'ended') {
+                    totalVotes = 0;
+                    candidates.forEach(c => c.votes = 0);
+                    saveState();
+                }
+                votingState = 'active';
+                updateUIforVotingState();
+            });
+
+            endVotingButton.addEventListener('click', () => {
+                votingState = 'ended';
+                updateUIforVotingState();
+            });
+
+            // ... (이하 스크립트는 이전 버전과 동일합니다) ...
+            
+            retakeVoteButton.addEventListener('click', () => {
+                if (votingState === 'active') {
+                    resetSimulation();
+                }
+            });
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                photoDropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); });
+            });
+            ['dragenter', 'dragover'].forEach(eventName => {
+                photoDropZone.addEventListener(eventName, () => photoDropZone.classList.add('dragover'));
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                photoDropZone.addEventListener(eventName, () => photoDropZone.classList.remove('dragover'));
+            });
+            photoDropZone.addEventListener('drop', e => {
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    candidatePhotoInput.files = e.dataTransfer.files;
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+            candidatePhotoInput.addEventListener('change', e => {
+                 if (e.target.files && e.target.files[0]) { handleFile(e.target.files[0]); }
+            });
+
+            function handleFile(file) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        photoPreview.src = e.target.result;
+                        photoPreview.classList.remove('hidden');
+                        dropZonePrompt.classList.add('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert('이미지 파일만 업로드할 수 있습니다.');
+                }
+            }
+            
+            function resetPhotoDropZone() {
+                 candidatePhotoInput.value = '';
+                 photoPreview.classList.add('hidden');
+                 photoPreview.src = '';
+                 dropZonePrompt.classList.remove('hidden');
+            }
+            
+            candidateForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('candidate-name').value;
+                const party = document.getElementById('party-name').value;
+                const color = document.getElementById('party-color').value;
+                const photoFile = candidatePhotoInput.files[0];
+                let photoDataUrl;
+
+                if (photoFile) {
+                    photoDataUrl = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsDataURL(photoFile);
+                    });
+                } else {
+                    photoDataUrl = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Cg fill="%23cccccc"%3E%3Ccircle cx="50" cy="35" r="20"/%3E%3Cpath d="M20,90 C20,70 80,70 80,90 Z" /%3E%3C/g%3E%3C/svg%3E';
+                }
+                
+                candidates.push({ id: nextId++, name, party, color, photo: photoDataUrl, votes: 0 });
+                saveState();
+                renderCandidates();
+                renderTally();
+                candidateForm.reset();
+                resetPhotoDropZone();
+            });
+
+            resetCandidatesButton.addEventListener('click', () => {
+                if(confirm('모든 후보자 정보와 투표 기록이 영구적으로 삭제됩니다. 계속하시겠습니까?')) {
+                    candidates = [];
+                    totalVotes = 0;
+                    nextId = 1;
+                    localStorage.removeItem(STORAGE_KEY);
+                    renderCandidates();
+                    renderTally();
+                    votingState = 'inactive';
+                    updateUIforVotingState();
+                    resetPhotoDropZone();
+                }
+            });
+            
+             const handleCandidateSelection = (candidate, cellElement) => {
+                if (votingState !== 'active' || isVotingProcess) return;
+                
+                const currentSelected = document.querySelector('.candidate-cell.selected');
+                if (currentSelected) currentSelected.classList.remove('selected');
+                cellElement.classList.add('selected');
+
+                selectedCandidate = candidates.find(c => c.id === candidate.id);
+
+                screenInitial.classList.add('hidden');
+                screenVoted.classList.add('hidden');
+                screenSelection.classList.remove('hidden');
+                screenSelection.innerHTML = `
+                    <h3 class="text-xl font-bold mb-2">선택 확인</h3>
+                    <img src="${candidate.photo}" alt="${candidate.name}" class="w-24 h-24 rounded-full mx-auto border-4 border-gray-400 my-2 object-cover">
+                    <p class="text-lg font-bold">${candidate.name}</p>
+                    <p class="text-md text-gray-300">${candidate.party}</p>
+                    <button id="vote-confirm-button" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded-lg transition-colors">투표하기</button>
+                `;
+                document.getElementById('vote-confirm-button').addEventListener('click', processVote);
+            };
+
+            const processVote = () => {
+                if (!selectedCandidate) return;
+                isVotingProcess = true;
+                
+                selectedCandidate.votes++;
+                totalVotes++;
+                saveState();
+                renderTally();
+
+                screenSelection.classList.add('hidden');
+                screenVoted.classList.remove('hidden');
+                const now = new Date();
+                receipt.innerHTML = `
+                    <h4 class="font-bold text-center text-lg border-b border-dashed border-black pb-1 mb-2">투표 확인증</h4>
+                    <p><strong>일시:</strong> ${now.toLocaleString('ko-KR')}</p>
+                    <hr class="border-dashed border-gray-400 my-2">
+                    <p class="font-bold">선택 후보:</p>
+                    <p class="text-lg font-bold my-1">${selectedCandidate.name} (${selectedCandidate.party})</p>
+                    <hr class="border-dashed border-gray-400 my-2">
+                `;
+                setTimeout(() => { receipt.classList.add('printing'); }, 500);
+
+                setTimeout(() => {
+                    if (votingState === 'active') {
+                        resetSimulation();
+                    }
+                }, 4000);
+            };
+
+            const resetSimulation = () => {
+                const currentSelected = document.querySelector('.candidate-cell.selected');
+                if (currentSelected) currentSelected.classList.remove('selected');
+                receipt.classList.remove('printing');
+                selectedCandidate = null;
+                screenVoted.classList.add('hidden');
+                screenSelection.classList.add('hidden');
+                screenInitial.classList.remove('hidden');
+                isVotingProcess = false;
+            };
+
+            loadState();
+            renderCandidates();
+            updateUIforVotingState();
+        });
+    </script>
+</body>
+</html>
+
+
