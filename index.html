@@ -95,18 +95,18 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-7xl mx-auto">
         <!-- 왼쪽: 투표기 및 관리 패널 -->
         <div class="space-y-8">
-            <!-- 투표기 본체 (이전과 동일) -->
+            <!-- 투표기 본체 -->
             <div class="machine-body rounded-2xl neumorphic-shadow">
-                 <div class="screen-bezel rounded-t-2xl p-5">
+                 <div class="screen-bezel rounded-t-2xl p-4 sm:p-5">
                     <div id="screen" class="screen rounded-lg flex flex-col items-center justify-center p-4 text-white">
                         <div id="screen-initial" class="text-center">
-                            <h2 class="text-2xl font-bold text-gray-300">투표 시스템</h2>
+                            <h2 class="text-xl sm:text-2xl font-bold text-gray-300">투표 시스템</h2>
                             <p class="text-gray-400 mt-2">'투표 시작' 버튼을 눌러주세요.</p>
                         </div>
                         <div id="screen-selection" class="hidden text-center"></div>
                         <div id="screen-voted" class="hidden text-center">
                              <svg class="w-16 h-16 text-green-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <h2 class="text-2xl font-bold text-green-300">투표 완료!</h2>
+                            <h2 class="text-xl sm:text-2xl font-bold text-green-300">투표 완료!</h2>
                             <p class="text-gray-400 mt-2 animate-pulse">영수증 인쇄 중...</p>
                         </div>
                     </div>
@@ -120,9 +120,8 @@
                 <div id="receipt" class="receipt w-2/3 mx-auto absolute left-0 right-0 top-full mt-[-80px] p-4"></div>
             </div>
             <!-- 관리 패널 -->
-            <div class="candidate-board rounded-2xl p-5 neumorphic-shadow">
-                <h2 class="text-xl font-bold text-gray-700 mb-4 pb-2 border-b-2">관리 패널</h2>
-                <!-- 투표 절차 (이전과 동일) -->
+            <div class="candidate-board rounded-2xl p-4 sm:p-5 neumorphic-shadow">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-700 mb-4 pb-2 border-b-2">관리 패널</h2>
                 <div class="mb-6">
                     <h3 class="font-bold text-gray-600 mb-3">투표 절차</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -131,11 +130,9 @@
                         <button id="end-voting-button" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors hidden">투표 종료</button>
                     </div>
                 </div>
-                <!-- 후보자 목록 관리 -->
                 <div>
                      <h3 class="font-bold text-gray-600 mb-3">후보자 목록 관리</h3>
                     <form id="candidate-form" class="space-y-4">
-                        <!-- 입력 필드들 (이전과 동일) -->
                         <input id="candidate-name" type="text" placeholder="후보자 이름" class="w-full p-3 rounded-lg neumorphic-shadow-inset bg-transparent" required>
                         <input id="party-name" type="text" placeholder="정당 이름" class="w-full p-3 rounded-lg neumorphic-shadow-inset bg-transparent" required>
                         <div class="flex items-center gap-4">
@@ -153,7 +150,6 @@
                         </div>
                         <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors">후보자 추가</button>
                     </form>
-                    <!-- NEW: 파일 관리 버튼 -->
                     <div class="grid grid-cols-2 gap-2 mt-4">
                         <button type="button" id="export-button" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors">목록 내보내기</button>
                         <button type="button" id="import-button" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors">목록 불러오기</button>
@@ -162,9 +158,9 @@
                     <button type="button" id="reset-candidates-button" class="w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors mt-2">전체 초기화</button>
                 </div>
             </div>
-            <!-- 투표 집계 패널 (이전과 동일) -->
-            <div class="candidate-board rounded-2xl p-5 neumorphic-shadow">
-                <h2 class="text-xl font-bold text-gray-700 mb-4 pb-2 border-b-2">투표 집계</h2>
+            <!-- 투표 집계 패널 -->
+            <div class="candidate-board rounded-2xl p-4 sm:p-5 neumorphic-shadow">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-700 mb-4 pb-2 border-b-2">투표 집계</h2>
                 <div class="mb-4">
                     <span class="font-bold text-gray-600">총 투표 수:</span>
                     <span id="total-votes" class="font-bold text-2xl text-blue-600">0</span>
@@ -173,15 +169,15 @@
             </div>
         </div>
 
-        <!-- 오른쪽: 후보자 선택 보드 (이전과 동일) -->
+        <!-- 오른쪽: 후보자 선택 보드 -->
         <div class="candidate-board rounded-2xl p-3 neumorphic-shadow w-full">
              <div id="board-overlay" class="board-overlay rounded-2xl">
-                <p id="overlay-text" class="text-2xl font-bold text-gray-800 bg-white/50 px-6 py-3 rounded-xl">투표 시작 버튼을 눌러주세요.</p>
+                <p id="overlay-text" class="text-xl sm:text-2xl font-bold text-gray-800 bg-white/50 px-6 py-3 rounded-xl">투표 시작 버튼을 눌러주세요.</p>
             </div>
             <div class="bg-white p-1 mb-2">
                 <img src="https://placehold.co/600x40/003366/FFFFFF?text=TARJETA+ELECTORAL" class="w-full" alt="Ballot Title"/>
             </div>
-            <div id="candidate-grid" class="grid grid-cols-4 gap-2 min-h-[300px]"></div>
+            <div id="candidate-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-2 min-h-[300px]"></div>
         </div>
     </div>
 
@@ -217,7 +213,6 @@
             let votingState = 'inactive';
             const STORAGE_KEY = 'votingSimulatorData';
 
-            // --- 데이터 관리 함수 ---
             const saveState = () => {
                 const state = { candidates, totalVotes };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -235,7 +230,6 @@
                 }
             };
             
-            // --- 렌더링 함수 (이전과 동일) ---
             const renderCandidates = () => {
                 const TOTAL_CELLS = 16;
                 candidateGrid.innerHTML = '';
@@ -263,8 +257,6 @@
             const renderTally = () => {
                 totalVotesEl.textContent = totalVotes;
                 tallyResultsEl.innerHTML = '';
-
-                // '투표 종료' 상태일 때만 상세 결과를 보여줍니다.
                 if (votingState === 'ended') {
                     if (candidates.length === 0) {
                          tallyResultsEl.innerHTML = `<p class="text-center text-gray-500">후보자가 없습니다.</p>`;
@@ -287,13 +279,12 @@
                         tallyResultsEl.appendChild(tallyItem);
                     });
                 } else {
-                    // 투표 중이거나 시작 전일 때는 결과를 가립니다.
                     tallyResultsEl.innerHTML = `<p class="text-center text-gray-500 p-4 neumorphic-shadow-inset rounded-lg">투표가 종료된 후 결과가 공개됩니다.</p>`;
                 }
             };
             
             const updateUIforVotingState = () => {
-                renderTally(); // 상태가 변경될 때마다 집계판을 다시 렌더링합니다.
+                renderTally();
                 if (votingState === 'inactive') {
                     boardOverlay.classList.remove('hidden');
                     overlayText.textContent = '투표 시작 버튼을 눌러주세요.';
@@ -318,8 +309,6 @@
                 }
             };
 
-            // --- 이벤트 리스너 ---
-            // 파일 내보내기/불러오기 리스너 추가
             exportButton.addEventListener('click', () => {
                 if (candidates.length === 0) {
                     alert('내보낼 후보자 목록이 없습니다.');
@@ -350,14 +339,13 @@
                         if (!Array.isArray(importedCandidates)) {
                             throw new Error('JSON 파일이 후보자 목록 형식이 아닙니다.');
                         }
-                        // 기본 유효성 검사
                         const isValid = importedCandidates.every(c => c.id && c.name && c.party && c.color && c.photo);
                         if (!isValid) {
                              throw new Error('후보자 데이터 일부가 누락되었습니다.');
                         }
 
                         if (confirm('현재 목록을 지우고 새 목록을 불러오시겠습니까? 투표 기록도 초기화됩니다.')) {
-                            candidates = importedCandidates.map(c => ({...c, votes: 0})); // votes 속성 초기화
+                            candidates = importedCandidates.map(c => ({...c, votes: 0}));
                             totalVotes = 0;
                             nextId = candidates.length > 0 ? Math.max(...candidates.map(c => c.id)) + 1 : 1;
                             saveState();
@@ -368,14 +356,12 @@
                     } catch (err) {
                         alert('파일을 불러오는 데 실패했습니다: ' + err.message);
                     } finally {
-                        importFileInput.value = ''; // 다음에도 같은 파일을 선택할 수 있도록 초기화
+                        importFileInput.value = '';
                     }
                 };
                 reader.readAsText(file);
             });
 
-
-            // 나머지 리스너는 이전과 동일
             startVotingButton.addEventListener('click', () => {
                 if(candidates.length === 0) {
                     alert('후보자를 먼저 추가해야 투표를 시작할 수 있습니다.'); return;
@@ -410,7 +396,6 @@
                         reader.readAsDataURL(photoFile);
                     });
                 } else {
-                    // 요청하신 대로, 사진이 없으면 사각형에 이름을 넣은 SVG를 생성합니다.
                     const encodedName = encodeURIComponent(name);
                     photoDataUrl = `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e9eef2'/%3E%3Ctext x='50' y='55' font-family='Roboto, sans-serif' font-size='14' text-anchor='middle' fill='%23333'%3E${encodedName}%3C/text%3E%3C/svg%3E`;
                 }
@@ -424,32 +409,19 @@
 
             resetCandidatesButton.addEventListener('click', () => {
                 if(confirm('모든 후보자 정보와 투표 기록이 영구적으로 삭제됩니다. 계속하시겠습니까?')) {
-                    // 1. LocalStorage 데이터 삭제
                     localStorage.removeItem(STORAGE_KEY);
-
-                    // 2. 메모리의 모든 관련 상태 변수 초기화
                     candidates = [];
                     totalVotes = 0;
                     nextId = 1;
-                    
-                    // 3. 현재 투표 상태 및 UI 초기화
-                    resetSimulation(); // 선택된 후보, 영수증 등 UI 초기화
-                    resetPhotoDropZone(); // 사진 입력 필드 초기화
-                    
-                    // 4. 전체 투표 프로세스 상태를 '비활성'으로 설정
+                    resetSimulation();
+                    resetPhotoDropZone();
                     votingState = 'inactive';
-                    
-                    // 5. 초기화된 데이터를 바탕으로 UI 전체를 다시 렌더링
-                    renderCandidates(); // 후보자 칸을 비움
-                    
-                    // 6. 버튼 및 오버레이 상태 최종 업데이트
-                    updateUIforVotingState(); // 집계판 비우기 포함
-
+                    renderCandidates();
+                    updateUIforVotingState();
                     alert('모든 데이터가 초기화되었습니다.');
                 }
             });
             
-            // 드래그 앤 드롭 및 투표 로직 (이전과 동일)
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 photoDropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); });
             });
@@ -500,7 +472,7 @@
                 screenVoted.classList.add('hidden');
                 screenSelection.classList.remove('hidden');
                 screenSelection.innerHTML = `
-                    <h3 class="text-xl font-bold mb-2">선택 확인</h3>
+                    <h3 class="text-xl sm:text-2xl font-bold mb-2">선택 확인</h3>
                     <img src="${candidate.photo}" alt="${candidate.name}" class="w-24 h-24 rounded-full mx-auto border-4 border-gray-400 my-2 object-cover">
                     <p class="text-lg font-bold">${candidate.name}</p>
                     <p class="text-md text-gray-300">${candidate.party}</p>
@@ -544,7 +516,6 @@
                 isVotingProcess = false;
             };
 
-            // --- 초기화 ---
             loadState();
             renderCandidates();
             updateUIforVotingState();
@@ -552,3 +523,4 @@
     </script>
 </body>
 </html>
+
