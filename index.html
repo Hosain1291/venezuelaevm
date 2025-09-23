@@ -244,8 +244,11 @@
                         cell.dataset.id = c.id;
                         cell.innerHTML = `
                             <img src="${c.photo}" alt="${c.name}" class="w-full h-[55%] object-cover">
-                            <p class="text-center font-bold text-black text-[10px] py-1">${c.name}</p>
-                            <div class="party-banner w-full text-center text-white font-bold text-sm mt-auto flex-grow flex items-center justify-center" style="background-color: ${c.color};">${c.party}</div>
+                            <div class="text-center p-1 flex-grow flex flex-col justify-center">
+                                <p class="font-bold text-black text-[11px] leading-tight">${c.name}</p>
+                                <p class="font-semibold text-gray-700 text-[10px] leading-tight">${c.party}</p>
+                            </div>
+                            <div class="w-full h-3 mt-auto" style="background-color: ${c.color};"></div>
                         `;
                         cell.addEventListener('click', () => handleCandidateSelection(c, cell));
                         candidateGrid.appendChild(cell);
