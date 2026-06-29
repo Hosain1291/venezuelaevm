@@ -90,6 +90,21 @@
             border-color: #3b82f6;
             background-color: #eff6ff;
         }
+        /* 우측 투표지 영역 커스텀 스크롤바 디자인 */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #e9eef2;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #b0b8c0;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #9098a0;
+        }
     </style>
 </head>
 <body class="p-4 lg:p-8">
@@ -178,22 +193,21 @@
             </div>
         </div>
 
-        <!-- 오른쪽: 후보자 선택 보드 -->
-        <div class="candidate-board rounded-2xl p-3 neumorphic-shadow w-full">
+        <!-- 오른쪽: 후보자 선택 보드 (스크롤 대응) -->
+        <div class="candidate-board rounded-2xl p-3 neumorphic-shadow w-full max-h-[90vh] overflow-y-auto custom-scrollbar">
              <div id="board-overlay" class="board-overlay rounded-2xl">
-                <p id="overlay-text" class="text-xl sm:text-2xl font-bold text-gray-800 bg-white/50 px-6 py-3 rounded-xl">투표 시작 버튼을 눌러주세요.</p>
+                <p id="overlay-text" class="text-xl sm:text-2xl font-bold text-gray-800 bg-white/50 px-6 py-3 rounded-xl text-center">투표 시작 버튼을 눌러주세요.</p>
             </div>
-            <div class="bg-white p-1 mb-2">
-                <img src="https://placehold.co/600x40/003366/FFFFFF?text=TARJETA+ELECTORAL" class="w-full" alt="Ballot Title"/>
-            </div>
-            <div id="candidate-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-2 min-h-[300px]"></div>
+            
+            <!-- 투표 용지들이 삽입되는 컨테이너 -->
+            <div id="ballots-container" class="space-y-6"></div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const candidateForm = document.getElementById('candidate-form');
-            const candidateGrid = document.getElementById('candidate-grid');
+            const ballotsContainer = document.getElementById('ballots-container');
             const resetCandidatesButton = document.getElementById('reset-candidates-button');
             const startVotingButton = document.getElementById('start-voting-button');
             const endVotingButton = document.getElementById('end-voting-button');
@@ -240,27 +254,69 @@
                 }
             };
             
+            // 16명 단위로 쪼개어 다중 투표용지를 생성하는 렌더링 로직
             const renderCandidates = () => {
-                const TOTAL_CELLS = 16;
-                candidateGrid.innerHTML = '';
-                for (let i = 0; i < TOTAL_CELLS; i++) {
-                    if (i < candidates.length) {
-                        const c = candidates[i];
-                        const cell = document.createElement('div');
-                        cell.className = 'candidate-cell rounded aspect-[3/4]';
-                        cell.dataset.id = c.id;
-                        cell.innerHTML = `
-                            <img src="${c.photo}" alt="${c.name}" class="w-full h-[60%] object-cover">
-                            <p class="text-center font-bold text-black text-xs py-1">${c.name}</p>
-                            <div class="party-banner w-full text-center text-white font-bold text-sm mt-auto flex-grow flex items-center justify-center p-1" style="background-color: ${c.color};">${c.party}</div>
-                        `;
-                        cell.addEventListener('click', () => handleCandidateSelection(c, cell));
-                        candidateGrid.appendChild(cell);
-                    } else {
-                        const placeholder = document.createElement('div');
-                        placeholder.className = 'candidate-cell rounded bg-gray-200/50 neumorphic-shadow-inset aspect-[3/4]';
-                        candidateGrid.appendChild(placeholder);
+                ballotsContainer.innerHTML = '';
+                
+                const CELLS_PER_SHEET = 16; // 한 장당 4x4 (16칸) 고정
+                const totalSheets = Math.max(1, Math.ceil(candidates.length / CELLS_PER_SHEET));
+                
+                if (candidates.length === 0) {
+                    ballotsContainer.innerHTML = `
+                        <div class="bg-white p-4 rounded-xl text-center border border-gray-300">
+                            <p class="text-gray-500 p-10">왼쪽 관리 패널에서 후보자를 추가해주세요.</p>
+                        </div>`;
+                    return;
+                }
+
+                for (let s = 0; s < totalSheets; s++) {
+                    // 개별 투표용지 프레임 생성
+                    const sheetDiv = document.createElement('div');
+                    sheetDiv.className = 'bg-white p-2 rounded-xl border-2 border-gray-300 shadow-sm';
+                    
+                    // 각 장의 타이틀 헤더
+                    const headerDiv = document.createElement('div');
+                    headerDiv.className = 'bg-[#003366] text-white p-2 mb-2 font-bold text-center text-xs sm:text-sm rounded flex justify-between items-center';
+                    headerDiv.innerHTML = `
+                        <span>TARJETA ELECTORAL (투표용지)</span>
+                        <span class="bg-blue-600 text-[10px] px-2 py-0.5 rounded">PÁGINA ${s + 1} / ${totalSheets}</span>
+                    `;
+                    sheetDiv.appendChild(headerDiv);
+                    
+                    // 4열 그리드 생성
+                    const gridDiv = document.createElement('div');
+                    gridDiv.className = 'grid grid-cols-4 gap-2';
+                    
+                    for (let i = 0; i < CELLS_PER_SHEET; i++) {
+                        const candidateIndex = s * CELLS_PER_SHEET + i;
+                        
+                        if (candidateIndex < candidates.length) {
+                            const c = candidates[candidateIndex];
+                            const cell = document.createElement('div');
+                            cell.className = 'candidate-cell rounded aspect-[3/4]';
+                            cell.dataset.id = c.id;
+                            
+                            // 선택 상태 유지 체크
+                            if (selectedCandidate && selectedCandidate.id === c.id) {
+                                cell.classList.add('selected');
+                            }
+                            
+                            cell.innerHTML = `
+                                <img src="${c.photo}" alt="${c.name}" class="w-full h-[60%] object-cover" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Crect width=\\'100\\' height=\\'100\\' fill=\\'%23e9eef2\\'/%3E%3C/svg%3E'">
+                                <p class="text-center font-bold text-black text-[10px] sm:text-xs py-1 leading-tight flex-grow flex items-center justify-center">${c.name}</p>
+                                <div class="party-banner w-full text-center text-white font-bold text-sm mt-auto flex-grow flex items-center justify-center p-1" style="background-color: ${c.color};">${c.party}</div>
+                            `;
+                            cell.addEventListener('click', () => handleCandidateSelection(c, cell));
+                            gridDiv.appendChild(cell);
+                        } else {
+                            // 빈 칸 플레이스홀더 생성 (비율 3:4 유지)
+                            const placeholder = document.createElement('div');
+                            placeholder.className = 'candidate-cell rounded bg-gray-100 border border-dashed border-gray-300 aspect-[3/4]';
+                            gridDiv.appendChild(placeholder);
+                        }
                     }
+                    sheetDiv.appendChild(gridDiv);
+                    ballotsContainer.appendChild(sheetDiv);
                 }
             };
 
@@ -479,9 +535,12 @@
 
              const handleCandidateSelection = (candidate, cellElement) => {
                 if (votingState !== 'active' || isVotingProcess) return;
-                const currentSelected = document.querySelector('.candidate-cell.selected');
-                if (currentSelected) currentSelected.classList.remove('selected');
+                
+                // 기존의 선택 표시 제거 후 새로 추가
+                const currentSelected = document.querySelectorAll('.candidate-cell.selected');
+                currentSelected.forEach(el => el.classList.remove('selected'));
                 cellElement.classList.add('selected');
+                
                 selectedCandidate = candidates.find(c => c.id === candidate.id);
                 screenInitial.classList.add('hidden');
                 screenVoted.classList.add('hidden');
