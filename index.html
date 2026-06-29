@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>베네수엘라 전자투표</title>
+    <title>최종 투표 시뮬레이터</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -142,14 +142,20 @@
                             <label for="party-color" class="font-semibold text-gray-600">정당 색상:</label>
                             <input id="party-color" type="color" value="#c92a2a" class="w-12 h-12 rounded-lg cursor-pointer overflow-hidden border-2 border-transparent neumorphic-shadow">
                         </div>
-                        <div id="photo-drop-zone" class="border-2 border-dashed border-gray-400 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors">
-                             <label for="candidate-photo" class="font-semibold text-gray-600 mb-2 block cursor-pointer">후보자 사진 (선택 사항)</label>
-                             <div id="drop-zone-prompt">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                 <p class="text-gray-500 mt-2">여기에 파일을 드래그 앤 드롭하거나<br><span class="text-blue-500 font-semibold">클릭하여 선택하세요.</span></p>
-                             </div>
-                             <input id="candidate-photo" type="file" accept="image/*" class="hidden">
-                             <img id="photo-preview" src="" alt="사진 미리보기" class="hidden max-h-24 mx-auto mt-2 rounded">
+                        <!-- 사진 등록 방식 (사진 URL 혹은 사진 업로드) -->
+                        <div>
+                            <label class="font-semibold text-gray-600 mb-2 block">후보자 사진 등록 (선택 사항)</label>
+                            <input id="candidate-photo-url" type="text" placeholder="사진 이미지 URL 주소 입력 (직접 입력)" class="w-full p-3 rounded-lg neumorphic-shadow-inset bg-transparent mb-3">
+                            
+                            <div id="photo-drop-zone" class="border-2 border-dashed border-gray-400 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors">
+                                 <span class="font-semibold text-gray-600 mb-2 block">또는 파일 드래그 & 드롭으로 업로드</span>
+                                 <div id="drop-zone-prompt">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                     <p class="text-gray-500 mt-2">여기에 파일을 드래그 앤 드롭하거나<br><span class="text-blue-500 font-semibold">클릭하여 선택하세요.</span></p>
+                                 </div>
+                                 <input id="candidate-photo" type="file" accept="image/*" class="hidden">
+                                 <img id="photo-preview" src="" alt="사진 미리보기" class="hidden max-h-24 mx-auto mt-2 rounded">
+                            </div>
                         </div>
                         <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors">후보자 추가</button>
                     </form>
@@ -204,6 +210,7 @@
             const photoPreview = document.getElementById('photo-preview');
             const dropZonePrompt = document.getElementById('drop-zone-prompt');
             const candidatePhotoInput = document.getElementById('candidate-photo');
+            const candidatePhotoUrlInput = document.getElementById('candidate-photo-url');
             const exportButton = document.getElementById('export-button');
             const importButton = document.getElementById('import-button');
             const importFileInput = document.getElementById('import-file-input');
@@ -390,9 +397,13 @@
                 const name = document.getElementById('candidate-name').value;
                 const party = document.getElementById('party-name').value;
                 const color = document.getElementById('party-color').value;
+                const photoUrlVal = candidatePhotoUrlInput.value.trim();
                 const photoFile = candidatePhotoInput.files[0];
                 let photoDataUrl;
-                if (photoFile) {
+                
+                if (photoUrlVal) {
+                    photoDataUrl = photoUrlVal;
+                } else if (photoFile) {
                     photoDataUrl = await new Promise((resolve) => {
                         const reader = new FileReader();
                         reader.onload = (e) => resolve(e.target.result);
@@ -460,6 +471,7 @@
             
             function resetPhotoDropZone() {
                  candidatePhotoInput.value = '';
+                 candidatePhotoUrlInput.value = '';
                  photoPreview.classList.add('hidden');
                  photoPreview.src = '';
                  dropZonePrompt.classList.remove('hidden');
@@ -476,7 +488,7 @@
                 screenSelection.classList.remove('hidden');
                 screenSelection.innerHTML = `
                     <h3 class="text-xl sm:text-2xl font-bold mb-2">선택 확인</h3>
-                    <img src="${candidate.photo}" alt="${candidate.name}" class="w-24 h-24 rounded-full mx-auto border-4 border-gray-400 my-2 object-cover">
+                    <img src="${candidate.photo}" alt="${candidate.name}" class="w-24 h-24 rounded-full mx-auto border-4 border-gray-400 my-2 object-cover" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Crect width=\\'100\\' height=\\'100\\' fill=\\'%23e9eef2\\'/%3E%3C/svg%3E'">
                     <p class="text-lg font-bold">${candidate.name}</p>
                     <p class="text-md text-gray-300">${candidate.party}</p>
                     <button id="vote-confirm-button" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded-lg transition-colors">투표하기</button>
@@ -532,6 +544,3 @@
     </script>
 </body>
 </html>
-
-
-
