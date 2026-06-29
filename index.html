@@ -11,6 +11,7 @@
             font-family: 'Roboto', sans-serif;
             background-color: #e0e5ec;
         }
+        /* 뉴모피즘 그림자 효과 */
         .neumorphic-shadow {
             box-shadow: 8px 8px 16px #c5c9d0, -8px -8px 16px #fbffff;
         }
@@ -36,6 +37,7 @@
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
             z-index: 10;
         }
+        /* 실감나는 영수증 인쇄 슬라이드 애니메이션 */
         .receipt {
             background-color: #ffffff;
             border: 1px solid #ccc;
@@ -64,6 +66,7 @@
             z-index: 20;
             transition: opacity 0.3s;
         }
+        /* 후보자 칸: 호버/클릭 시 크기는 그대로 유지하고 테두리/그림자 피드백만 작동 */
         .candidate-cell {
             background-color: white;
             border: 2px solid #b0b8c0;
@@ -90,7 +93,7 @@
             border-color: #3b82f6;
             background-color: #eff6ff;
         }
-        /* 우측 투표지 영역 커스텀 스크롤바 디자인 */
+        /* 우측 투표지 커스텀 스크롤바 */
         .custom-scrollbar::-webkit-scrollbar {
             width: 8px;
         }
@@ -109,9 +112,9 @@
 </head>
 <body class="p-4 lg:p-8">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-7xl mx-auto">
-        <!-- 왼쪽: 투표기 및 관리 패널 -->
+        <!-- 왼쪽: 투표기 본체 및 관리 영역 -->
         <div class="space-y-8">
-            <!-- 투표기 본체 -->
+            <!-- 투표기 하드웨어 시뮬레이터 -->
             <div class="machine-body rounded-2xl neumorphic-shadow">
                  <div class="screen-bezel rounded-t-2xl p-4 sm:p-5">
                     <div id="screen" class="screen rounded-lg flex flex-col items-center justify-center p-4 text-white">
@@ -119,7 +122,7 @@
                             <h2 class="text-xl sm:text-2xl font-bold text-gray-300">투표 시스템</h2>
                             <p class="text-gray-400 mt-2">'투표 시작' 버튼을 눌러주세요.</p>
                         </div>
-                        <div id="screen-selection" class="hidden text-center"></div>
+                        <div id="screen-selection" class="hidden text-center w-full"></div>
                         <div id="screen-voted" class="hidden text-center">
                              <svg class="w-16 h-16 text-green-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <h2 class="text-xl sm:text-2xl font-bold text-green-300">투표 완료!</h2>
@@ -129,6 +132,7 @@
                 </div>
                 <div class="p-4 relative">
                     <div class="printer-slot h-3 w-3/4 mx-auto rounded"></div>
+                    <!-- 영수증 출구 배출구 바로 아래 위치 -->
                     <div class="absolute w-full left-0 top-[calc(1rem+0.75rem)] flex justify-center">
                          <div id="receipt" class="receipt w-[180px] p-2"></div>
                     </div>
@@ -137,9 +141,12 @@
                     </div>
                 </div>
             </div>
-            <!-- 관리 패널 -->
+
+            <!-- 관리자용 설정 패널 -->
             <div class="candidate-board rounded-2xl p-4 sm:p-5 neumorphic-shadow">
                 <h2 class="text-lg sm:text-xl font-bold text-gray-700 mb-4 pb-2 border-b-2">관리 패널</h2>
+                
+                <!-- 투표 진행 컨트롤 -->
                 <div class="mb-6">
                     <h3 class="font-bold text-gray-600 mb-3">투표 절차</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -148,25 +155,28 @@
                         <button id="end-voting-button" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors hidden">투표 종료</button>
                     </div>
                 </div>
+
+                <!-- 후보자 정보 입력 및 파일 관리 -->
                 <div>
-                     <h3 class="font-bold text-gray-600 mb-3">후보자 목록 관리</h3>
+                    <h3 class="font-bold text-gray-600 mb-3">후보자 목록 관리 (자동 저장)</h3>
                     <form id="candidate-form" class="space-y-4">
-                        <input id="candidate-name" type="text" placeholder="후보자 이름" class="w-full p-3 rounded-lg neumorphic-shadow-inset bg-transparent" required>
-                        <input id="party-name" type="text" placeholder="정당 이름" class="w-full p-3 rounded-lg neumorphic-shadow-inset bg-transparent" required>
+                        <input id="candidate-name" type="text" placeholder="후보자 이름" class="w-full p-3 rounded-lg neumorphic-shadow-inset bg-transparent outline-none" required>
+                        <input id="party-name" type="text" placeholder="정당 이름" class="w-full p-3 rounded-lg neumorphic-shadow-inset bg-transparent outline-none" required>
                         <div class="flex items-center gap-4">
                             <label for="party-color" class="font-semibold text-gray-600">정당 색상:</label>
                             <input id="party-color" type="color" value="#c92a2a" class="w-12 h-12 rounded-lg cursor-pointer overflow-hidden border-2 border-transparent neumorphic-shadow">
                         </div>
-                        <!-- 사진 등록 방식 (사진 URL 혹은 사진 업로드) -->
-                        <div>
-                            <label class="font-semibold text-gray-600 mb-2 block">후보자 사진 등록 (선택 사항)</label>
-                            <input id="candidate-photo-url" type="text" placeholder="사진 이미지 URL 주소 입력 (직접 입력)" class="w-full p-3 rounded-lg neumorphic-shadow-inset bg-transparent mb-3">
+                        
+                        <!-- 사진 등록 방식 다원화 (URL 및 업로드 선택 가능) -->
+                        <div class="space-y-2">
+                            <label class="font-semibold text-gray-600 mb-1 block">후보자 사진 등록 (선택 사항)</label>
+                            <input id="candidate-photo-url" type="text" placeholder="인터넷 사진 이미지 URL 입력 (가장 권장)" class="w-full p-3 rounded-lg neumorphic-shadow-inset bg-transparent outline-none text-sm">
                             
-                            <div id="photo-drop-zone" class="border-2 border-dashed border-gray-400 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors">
-                                 <span class="font-semibold text-gray-600 mb-2 block">또는 파일 드래그 & 드롭으로 업로드</span>
+                            <div id="photo-drop-zone" class="border-2 border-dashed border-gray-400 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors bg-gray-50/50">
+                                 <span class="font-semibold text-gray-600 mb-1 block text-sm">또는 이미지 파일 드래그 앤 드롭</span>
                                  <div id="drop-zone-prompt">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                     <p class="text-gray-500 mt-2">여기에 파일을 드래그 앤 드롭하거나<br><span class="text-blue-500 font-semibold">클릭하여 선택하세요.</span></p>
+                                    <svg class="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                     <p class="text-xs text-gray-500 mt-1">이곳에 파일을 드래그하여 놓거나 클릭하세요.</p>
                                  </div>
                                  <input id="candidate-photo" type="file" accept="image/*" class="hidden">
                                  <img id="photo-preview" src="" alt="사진 미리보기" class="hidden max-h-24 mx-auto mt-2 rounded">
@@ -174,15 +184,18 @@
                         </div>
                         <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors">후보자 추가</button>
                     </form>
+
+                    <!-- 후보자 저장 파일 내보내기/불러오기 -->
                     <div class="grid grid-cols-2 gap-2 mt-4">
-                        <button type="button" id="export-button" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors">목록 내보내기</button>
-                        <button type="button" id="import-button" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors">목록 불러오기</button>
+                        <button type="button" id="export-button" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors text-sm">목록 파일 저장</button>
+                        <button type="button" id="import-button" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors text-sm">목록 불러오기</button>
                         <input type="file" id="import-file-input" class="hidden" accept=".json">
                     </div>
-                    <button type="button" id="reset-candidates-button" class="w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors mt-2">전체 초기화</button>
+                    <button type="button" id="reset-candidates-button" class="w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 rounded-lg neumorphic-shadow transition-colors mt-2 text-sm">전체 초기화</button>
                 </div>
             </div>
-            <!-- 투표 집계 패널 -->
+
+            <!-- 실시간 투표 집계 현황 (투표 중 가려짐 규칙 수립) -->
             <div class="candidate-board rounded-2xl p-4 sm:p-5 neumorphic-shadow">
                 <h2 class="text-lg sm:text-xl font-bold text-gray-700 mb-4 pb-2 border-b-2">투표 집계</h2>
                 <div class="mb-4">
@@ -193,21 +206,41 @@
             </div>
         </div>
 
-        <!-- 오른쪽: 후보자 선택 보드 (스크롤 대응) -->
-        <div class="candidate-board rounded-2xl p-3 neumorphic-shadow w-full max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <!-- 오른쪽: 단일 투표용지 보드 (스크롤 대응 및 3:4 비율 고정) -->
+        <div class="candidate-board rounded-2xl p-4 neumorphic-shadow w-full max-h-[95vh] overflow-y-auto custom-scrollbar flex flex-col justify-start">
              <div id="board-overlay" class="board-overlay rounded-2xl">
                 <p id="overlay-text" class="text-xl sm:text-2xl font-bold text-gray-800 bg-white/50 px-6 py-3 rounded-xl text-center">투표 시작 버튼을 눌러주세요.</p>
             </div>
             
-            <!-- 투표 용지들이 삽입되는 컨테이너 -->
-            <div id="ballots-container" class="space-y-6"></div>
+            <!-- 단 하나의 통합 투표 용지 프레임 -->
+            <div class="bg-white p-3 rounded-xl border-2 border-gray-300 shadow-sm flex flex-col flex-grow">
+                <div class="bg-[#003366] text-white p-2.5 mb-3 font-bold text-center text-xs sm:text-sm rounded shadow-sm">
+                    <span>TARJETA ELECTORAL (투표용지)</span>
+                </div>
+                
+                <!-- 단일 확장형 그리드 (4열 고정, 후보가 가득 차면 아래로 무한 추가) -->
+                <div id="candidate-grid" class="grid grid-cols-4 gap-2 flex-grow"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 세련된 맞춤형 커스텀 알림/확인 대화상자 (native alert 및 confirm 브라우저 차단 우회) -->
+    <div id="custom-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl transform transition-transform duration-200 scale-95 opacity-0" id="custom-modal-content">
+            <h3 class="text-lg font-bold text-gray-800 mb-2" id="custom-modal-title">알림</h3>
+            <p class="text-sm text-gray-600 mb-6 whitespace-pre-line" id="custom-modal-message">내용</p>
+            <div class="flex justify-end gap-3" id="custom-modal-actions">
+                <button id="custom-modal-cancel" class="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors text-sm">취소</button>
+                <button id="custom-modal-confirm" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-sm font-bold">확인</button>
+            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // DOM 엘리먼트 정의
             const candidateForm = document.getElementById('candidate-form');
-            const ballotsContainer = document.getElementById('ballots-container');
+            const candidateGrid = document.getElementById('candidate-grid');
             const resetCandidatesButton = document.getElementById('reset-candidates-button');
             const startVotingButton = document.getElementById('start-voting-button');
             const endVotingButton = document.getElementById('end-voting-button');
@@ -229,6 +262,15 @@
             const importButton = document.getElementById('import-button');
             const importFileInput = document.getElementById('import-file-input');
 
+            // 커스텀 모달 엘리먼트
+            const customModal = document.getElementById('custom-modal');
+            const customModalContent = document.getElementById('custom-modal-content');
+            const customModalTitle = document.getElementById('custom-modal-title');
+            const customModalMessage = document.getElementById('custom-modal-message');
+            const customModalCancel = document.getElementById('custom-modal-cancel');
+            const customModalConfirm = document.getElementById('custom-modal-confirm');
+
+            // 투표 상태 데이터 정의
             let candidates = [];
             let totalVotes = 0;
             let selectedCandidate = null;
@@ -237,6 +279,53 @@
             let votingState = 'inactive';
             const STORAGE_KEY = 'votingSimulatorData';
 
+            // --- 커스텀 경고 및 선택 대화창 시스템 ---
+            const showAppAlert = (title, message) => {
+                customModalTitle.textContent = title;
+                customModalMessage.textContent = message;
+                customModalCancel.classList.add('hidden');
+                
+                customModalConfirm.onclick = () => {
+                    customModalContent.classList.remove('scale-100', 'opacity-100');
+                    customModalContent.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => customModal.classList.add('hidden'), 200);
+                };
+
+                customModal.classList.remove('hidden');
+                setTimeout(() => {
+                    customModalContent.classList.remove('scale-95', 'opacity-0');
+                    customModalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            };
+
+            const showAppConfirm = (title, message, onConfirm) => {
+                customModalTitle.textContent = title;
+                customModalMessage.textContent = message;
+                customModalCancel.classList.remove('hidden');
+                
+                customModalCancel.onclick = () => {
+                    customModalContent.classList.remove('scale-100', 'opacity-100');
+                    customModalContent.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => customModal.classList.add('hidden'), 200);
+                };
+
+                customModalConfirm.onclick = () => {
+                    customModalContent.classList.remove('scale-100', 'opacity-100');
+                    customModalContent.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => {
+                        customModal.classList.add('hidden');
+                        onConfirm();
+                    }, 200);
+                };
+
+                customModal.classList.remove('hidden');
+                setTimeout(() => {
+                    customModalContent.classList.remove('scale-95', 'opacity-0');
+                    customModalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            };
+
+            // --- 데이터 영구 보존용 브라우저 저장소 연동 ---
             const saveState = () => {
                 const state = { candidates, totalVotes };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -254,78 +343,56 @@
                 }
             };
             
-            // 16명 단위로 쪼개어 다중 투표용지를 생성하는 렌더링 로직
+            // --- 후보자 렌더링 로직 (단일 표, 한 칸씩 채우며 초과 시 하단으로 유연하게 증가) ---
             const renderCandidates = () => {
-                ballotsContainer.innerHTML = '';
+                candidateGrid.innerHTML = '';
                 
-                const CELLS_PER_SHEET = 16; // 한 장당 4x4 (16칸) 고정
-                const totalSheets = Math.max(1, Math.ceil(candidates.length / CELLS_PER_SHEET));
+                const MIN_CELLS = 16; // 기본 최소 4x4 구조 (16칸)
+                const COLUMNS = 4;    // 가로 4열 고정
+                let totalCells = MIN_CELLS;
                 
-                if (candidates.length === 0) {
-                    ballotsContainer.innerHTML = `
-                        <div class="bg-white p-4 rounded-xl text-center border border-gray-300">
-                            <p class="text-gray-500 p-10">왼쪽 관리 패널에서 후보자를 추가해주세요.</p>
-                        </div>`;
-                    return;
+                // 후보자가 16명을 초과하면, 한 줄(4열) 단위로 표를 연장하여 꽉 찬 구조를 만듭니다.
+                if (candidates.length > MIN_CELLS) {
+                    totalCells = Math.ceil(candidates.length / COLUMNS) * COLUMNS;
                 }
-
-                for (let s = 0; s < totalSheets; s++) {
-                    // 개별 투표용지 프레임 생성
-                    const sheetDiv = document.createElement('div');
-                    sheetDiv.className = 'bg-white p-2 rounded-xl border-2 border-gray-300 shadow-sm';
-                    
-                    // 각 장의 타이틀 헤더
-                    const headerDiv = document.createElement('div');
-                    headerDiv.className = 'bg-[#003366] text-white p-2 mb-2 font-bold text-center text-xs sm:text-sm rounded flex justify-between items-center';
-                    headerDiv.innerHTML = `
-                        <span>TARJETA ELECTORAL (투표용지)</span>
-                        <span class="bg-blue-600 text-[10px] px-2 py-0.5 rounded">PÁGINA ${s + 1} / ${totalSheets}</span>
-                    `;
-                    sheetDiv.appendChild(headerDiv);
-                    
-                    // 4열 그리드 생성
-                    const gridDiv = document.createElement('div');
-                    gridDiv.className = 'grid grid-cols-4 gap-2';
-                    
-                    for (let i = 0; i < CELLS_PER_SHEET; i++) {
-                        const candidateIndex = s * CELLS_PER_SHEET + i;
+                
+                for (let i = 0; i < totalCells; i++) {
+                    if (i < candidates.length) {
+                        const c = candidates[i];
+                        const cell = document.createElement('div');
+                        // 3:4 비율 고정 및 확대 없는 호버 처리
+                        cell.className = 'candidate-cell rounded aspect-[3/4] cursor-pointer';
+                        cell.dataset.id = c.id;
                         
-                        if (candidateIndex < candidates.length) {
-                            const c = candidates[candidateIndex];
-                            const cell = document.createElement('div');
-                            cell.className = 'candidate-cell rounded aspect-[3/4]';
-                            cell.dataset.id = c.id;
-                            
-                            // 선택 상태 유지 체크
-                            if (selectedCandidate && selectedCandidate.id === c.id) {
-                                cell.classList.add('selected');
-                            }
-                            
-                            cell.innerHTML = `
-                                <img src="${c.photo}" alt="${c.name}" class="w-full h-[60%] object-cover" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Crect width=\\'100\\' height=\\'100\\' fill=\\'%23e9eef2\\'/%3E%3C/svg%3E'">
-                                <p class="text-center font-bold text-black text-[10px] sm:text-xs py-1 leading-tight flex-grow flex items-center justify-center">${c.name}</p>
-                                <div class="party-banner w-full text-center text-white font-bold text-sm mt-auto flex-grow flex items-center justify-center p-1" style="background-color: ${c.color};">${c.party}</div>
-                            `;
-                            cell.addEventListener('click', () => handleCandidateSelection(c, cell));
-                            gridDiv.appendChild(cell);
-                        } else {
-                            // 빈 칸 플레이스홀더 생성 (비율 3:4 유지)
-                            const placeholder = document.createElement('div');
-                            placeholder.className = 'candidate-cell rounded bg-gray-100 border border-dashed border-gray-300 aspect-[3/4]';
-                            gridDiv.appendChild(placeholder);
+                        if (selectedCandidate && selectedCandidate.id === c.id) {
+                            cell.classList.add('selected');
                         }
+                        
+                        // 사진 아래에 이름 표시, 최하단에 꽉 채운 정당 배너 (사진 속 배치 완벽 모방)
+                        cell.innerHTML = `
+                            <img src="${c.photo}" alt="${c.name}" class="w-full h-[60%] object-cover" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Crect width=\\'100\\' height=\\'100\\' fill=\\'%23e9eef2\\'/%3E%3C/svg%3E'">
+                            <p class="text-center font-bold text-black text-[10px] sm:text-xs py-1 leading-tight flex-grow flex items-center justify-center">${c.name}</p>
+                            <div class="party-banner w-full text-center text-white font-bold text-xs sm:text-sm mt-auto flex-grow flex items-center justify-center p-1" style="background-color: ${c.color};">${c.party}</div>
+                        `;
+                        cell.addEventListener('click', () => handleCandidateSelection(c, cell));
+                        candidateGrid.appendChild(cell);
+                    } else {
+                        // 가독성을 지키기 위해 비활성화된 투명한 플레이스홀더를 덧붙여 표를 완벽하게 가득 채웁니다.
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'candidate-cell rounded bg-gray-100 border border-dashed border-gray-300 aspect-[3/4]';
+                        candidateGrid.appendChild(placeholder);
                     }
-                    sheetDiv.appendChild(gridDiv);
-                    ballotsContainer.appendChild(sheetDiv);
                 }
             };
 
+            // --- 실시간 득표율 집계 렌더링 ---
             const renderTally = () => {
                 totalVotesEl.textContent = totalVotes;
                 tallyResultsEl.innerHTML = '';
+                
                 if (votingState === 'ended') {
                     if (candidates.length === 0) {
-                         tallyResultsEl.innerHTML = `<p class="text-center text-gray-500">후보자가 없습니다.</p>`;
+                         tallyResultsEl.innerHTML = `<p class="text-center text-gray-500 text-sm">등록된 후보자가 없습니다.</p>`;
                          return;
                     }
                     const sortedCandidates = [...candidates].sort((a, b) => (b.votes || 0) - (a.votes || 0));
@@ -345,10 +412,11 @@
                         tallyResultsEl.appendChild(tallyItem);
                     });
                 } else {
-                    tallyResultsEl.innerHTML = `<p class="text-center text-gray-500 p-4 neumorphic-shadow-inset rounded-lg">투표가 종료된 후 결과가 공개됩니다.</p>`;
+                    tallyResultsEl.innerHTML = `<p class="text-center text-gray-500 p-4 neumorphic-shadow-inset rounded-lg text-sm font-semibold text-gray-600">투표가 종료된 후 상세 결과가 공개됩니다.</p>`;
                 }
             };
             
+            // --- 투표 절차 상태 관리 UI 제어 ---
             const updateUIforVotingState = () => {
                 renderTally();
                 if (votingState === 'inactive') {
@@ -358,6 +426,7 @@
                     endVotingButton.classList.add('hidden');
                     retakeVoteButton.classList.add('hidden');
                     screenInitial.querySelector('p').textContent = "'투표 시작' 버튼을 눌러주세요.";
+                    resetSimulation();
                 } else if (votingState === 'active') {
                     boardOverlay.classList.add('hidden');
                     startVotingButton.classList.add('hidden');
@@ -375,9 +444,10 @@
                 }
             };
 
+            // --- 파일 불러오기 및 저장 기능 리스너 ---
             exportButton.addEventListener('click', () => {
                 if (candidates.length === 0) {
-                    alert('내보낼 후보자 목록이 없습니다.');
+                    showAppAlert('오류', '내보낼 후보자 목록이 없습니다.');
                     return;
                 }
                 const dataStr = JSON.stringify(candidates, null, 2);
@@ -403,24 +473,24 @@
                     try {
                         const importedCandidates = JSON.parse(event.target.result);
                         if (!Array.isArray(importedCandidates)) {
-                            throw new Error('JSON 파일이 후보자 목록 형식이 아닙니다.');
+                            throw new Error('올바른 후보자 리스트 파일 구조가 아닙니다.');
                         }
-                        const isValid = importedCandidates.every(c => c.id && c.name && c.party && c.color && c.photo);
+                        const isValid = importedCandidates.every(c => c.name && c.party && c.color && c.photo);
                         if (!isValid) {
-                             throw new Error('후보자 데이터 일부가 누락되었습니다.');
+                             throw new Error('일부 필수 데이터(이름, 정당, 색상, 사진)가 누락되어 있습니다.');
                         }
 
-                        if (confirm('현재 목록을 지우고 새 목록을 불러오시겠습니까? 투표 기록도 초기화됩니다.')) {
-                            candidates = importedCandidates.map(c => ({...c, votes: 0}));
+                        showAppConfirm('데이터 가져오기', '현재 저장된 목록을 지우고 새 목록을 가져오시겠습니까? 기존 투표 내역도 전부 리셋됩니다.', () => {
+                            candidates = importedCandidates.map(c => ({...c, id: c.id || nextId++, votes: 0}));
                             totalVotes = 0;
                             nextId = candidates.length > 0 ? Math.max(...candidates.map(c => c.id)) + 1 : 1;
                             saveState();
                             renderCandidates();
                             updateUIforVotingState();
-                            alert('후보자 목록을 성공적으로 불러왔습니다.');
-                        }
+                            showAppAlert('완료', '후보자 목록을 성공적으로 불러왔습니다.');
+                        });
                     } catch (err) {
-                        alert('파일을 불러오는 데 실패했습니다: ' + err.message);
+                        showAppAlert('불러오기 실패', err.message);
                     } finally {
                         importFileInput.value = '';
                     }
@@ -428,9 +498,11 @@
                 reader.readAsText(file);
             });
 
+            // --- 버튼 컨트롤 영역 ---
             startVotingButton.addEventListener('click', () => {
                 if(candidates.length === 0) {
-                    alert('후보자를 먼저 추가해야 투표를 시작할 수 있습니다.'); return;
+                    showAppAlert('안내', '후보자를 1명 이상 등록해야 선거를 실행할 수 있습니다.'); 
+                    return;
                 }
                 if (votingState === 'ended') {
                     totalVotes = 0;
@@ -440,18 +512,21 @@
                 votingState = 'active';
                 updateUIforVotingState();
             });
+            
             endVotingButton.addEventListener('click', () => {
                 votingState = 'ended';
                 updateUIforVotingState();
             });
+            
             retakeVoteButton.addEventListener('click', () => {
                 if (votingState === 'active') { resetSimulation(); }
             });
 
+            // --- 후보자 등록 폼 송신 처리 ---
             candidateForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const name = document.getElementById('candidate-name').value;
-                const party = document.getElementById('party-name').value;
+                const name = document.getElementById('candidate-name').value.trim();
+                const party = document.getElementById('party-name').value.trim();
                 const color = document.getElementById('party-color').value;
                 const photoUrlVal = candidatePhotoUrlInput.value.trim();
                 const photoFile = candidatePhotoInput.files[0];
@@ -466,9 +541,11 @@
                         reader.readAsDataURL(photoFile);
                     });
                 } else {
+                    // 사진 미첨부 시 생성되는 이름 기반 사각형 대체 프로필 이미지
                     const encodedName = encodeURIComponent(name);
                     photoDataUrl = `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e9eef2'/%3E%3Ctext x='50' y='55' font-family='Roboto, sans-serif' font-size='14' text-anchor='middle' fill='%23333'%3E${encodedName}%3C/text%3E%3C/svg%3E`;
                 }
+                
                 candidates.push({ id: nextId++, name, party, color, photo: photoDataUrl, votes: 0 });
                 saveState();
                 renderCandidates();
@@ -477,8 +554,9 @@
                 resetPhotoDropZone();
             });
 
+            // --- 전체 데이터 초기화 ---
             resetCandidatesButton.addEventListener('click', () => {
-                if(confirm('모든 후보자 정보와 투표 기록이 영구적으로 삭제됩니다. 계속하시겠습니까?')) {
+                showAppConfirm('주의', '모든 후보자 데이터와 투표 기록이 컴퓨터에서 지워집니다. 진행할까요?', () => {
                     localStorage.removeItem(STORAGE_KEY);
                     candidates = [];
                     totalVotes = 0;
@@ -488,10 +566,11 @@
                     votingState = 'inactive';
                     renderCandidates();
                     updateUIforVotingState();
-                    alert('모든 데이터가 초기화되었습니다.');
-                }
+                    showAppAlert('완료', '모든 데이터가 완벽하게 포맷되었습니다.');
+                });
             });
             
+            // --- 드래그 앤 드롭 파일 탐색 이벤트 바인딩 ---
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 photoDropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); });
             });
@@ -521,7 +600,7 @@
                     };
                     reader.readAsDataURL(file);
                 } else {
-                    alert('이미지 파일만 업로드할 수 있습니다.');
+                    showAppAlert('오류', '이미지 형식의 파일만 업로드할 수 있습니다.');
                 }
             }
             
@@ -533,10 +612,10 @@
                  dropZonePrompt.classList.remove('hidden');
             }
 
-             const handleCandidateSelection = (candidate, cellElement) => {
+            // --- 투표용지에서 후보 선택 시 기기 화면 연동 ---
+            const handleCandidateSelection = (candidate, cellElement) => {
                 if (votingState !== 'active' || isVotingProcess) return;
                 
-                // 기존의 선택 표시 제거 후 새로 추가
                 const currentSelected = document.querySelectorAll('.candidate-cell.selected');
                 currentSelected.forEach(el => el.classList.remove('selected'));
                 cellElement.classList.add('selected');
@@ -548,37 +627,43 @@
                 screenSelection.innerHTML = `
                     <h3 class="text-xl sm:text-2xl font-bold mb-2">선택 확인</h3>
                     <img src="${candidate.photo}" alt="${candidate.name}" class="w-24 h-24 rounded-full mx-auto border-4 border-gray-400 my-2 object-cover" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Crect width=\\'100\\' height=\\'100\\' fill=\\'%23e9eef2\\'/%3E%3C/svg%3E'">
-                    <p class="text-lg font-bold">${candidate.name}</p>
-                    <p class="text-md text-gray-300">${candidate.party}</p>
-                    <button id="vote-confirm-button" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded-lg transition-colors">투표하기</button>
+                    <p class="text-lg font-bold text-white">${candidate.name}</p>
+                    <p class="text-md text-gray-300 font-semibold mb-3">${candidate.party}</p>
+                    <button id="vote-confirm-button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-8 rounded-lg transition-colors shadow">투표하기</button>
                 `;
                 document.getElementById('vote-confirm-button').addEventListener('click', processVote);
             };
 
+            // --- 투표 실행 및 영수증 롤인 인쇄 처리 ---
             const processVote = () => {
                 if (!selectedCandidate) return;
                 isVotingProcess = true;
-                selectedCandidate.votes++;
+                selectedCandidate.votes = (selectedCandidate.votes || 0) + 1;
                 totalVotes++;
                 saveState();
                 renderTally();
+                
                 screenSelection.classList.add('hidden');
                 screenVoted.classList.remove('hidden');
                 const now = new Date();
+                
+                // 실제 베네수엘라 CNE 영수증 구조 모방
                 receipt.innerHTML = `
                     <div class="text-center border-b border-gray-300 pb-1">
                         <p class="text-[8px] font-bold text-gray-600">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
                         <p class="text-[7px] text-gray-500">CONSEJO NACIONAL ELECTORAL</p>
                     </div>
                     <div class="text-center py-2">
-                        <p class="text-[9px]">PRESIDENTE</p>
-                        <p class="font-bold text-sm my-1">${selectedCandidate.name}</p>
+                        <p class="text-[9px] text-gray-400">PRESIDENTE</p>
+                        <p class="font-bold text-sm my-1 text-gray-800">${selectedCandidate.name}</p>
                         <p class="text-[10px] font-semibold" style="color: ${selectedCandidate.color};">${selectedCandidate.party}</p>
                     </div>
                     <div class="text-center text-[6px] text-gray-400 pt-1 border-t border-gray-300">
                         ${now.toLocaleString('es-VE')}
                     </div>
                 `;
+                
+                // 스르륵 아래로 흘러나오는 프린팅 기법
                 setTimeout(() => { receipt.classList.add('printing'); }, 500);
                 setTimeout(() => {
                     if (votingState === 'active') { resetSimulation(); }
@@ -596,6 +681,7 @@
                 isVotingProcess = false;
             };
 
+            // 초기 데이터 바인딩
             loadState();
             renderCandidates();
             updateUIforVotingState();
